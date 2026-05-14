@@ -1,6 +1,5 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/data/db';
-import type { WorkoutSet } from '@/types';
 
 export interface PreviousSetData {
   weight: number | null;

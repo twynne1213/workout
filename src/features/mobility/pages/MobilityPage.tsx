@@ -1,7 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useNavigate } from 'react-router-dom';
 import {
-  Plus, StretchHorizontal, Play, Calendar, Clock, Check,
+  Plus, StretchHorizontal, Play, Calendar, Check,
 } from 'lucide-react';
 import { nanoid } from 'nanoid';
 import { db } from '@/data/db';

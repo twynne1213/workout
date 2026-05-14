@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { Moon, Sun, Scale, Ruler, User, Trash2, Database, Bug } from 'lucide-react';
+import { Moon, Sun, Scale, Ruler, Trash2, Database, Bug } from 'lucide-react';
 import { db } from '@/data/db';
 import { seedSampleWeek } from '@/data/seed-week';
 import { PageHeader } from '@/shared/components/PageHeader';

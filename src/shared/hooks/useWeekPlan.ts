@@ -1,6 +1,6 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/data/db';
-import type { StagedWorkout, WeekCommit } from '@/types';
+import type { WeekCommit } from '@/types';
 
 /**
  * Returns the Monday 00:00:00 epoch of the current week.

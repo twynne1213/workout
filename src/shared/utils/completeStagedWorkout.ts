@@ -1,6 +1,6 @@
 import { db } from '@/data/db';
 import { getWeekStart, getDayStart } from '@/shared/hooks/useWeekPlan';
-import type { StagedWorkoutType } from '@/types';
+import type { StagedWorkout, StagedWorkoutType } from '@/types';
 
 /**
  * When a workout/cardio/mobility session is completed, find the matching
@@ -44,14 +44,13 @@ export async function completeStagedWorkout(
   if (!target) return;
 
   const now = Date.now();
-  const logField =
-    type === 'lift' ? 'completedWorkoutLogId'
-    : type === 'cardio' ? 'completedCardioSessionId'
-    : 'completedMobilityLogId';
-
-  await db.stagedWorkouts.update(target.id, {
+  const updates: Partial<StagedWorkout> = {
     status: 'completed',
-    [logField]: logId,
     updatedAt: now,
-  });
+  };
+  if (type === 'lift') updates.completedWorkoutLogId = logId;
+  else if (type === 'cardio') updates.completedCardioSessionId = logId;
+  else updates.completedMobilityLogId = logId;
+
+  await db.stagedWorkouts.update(target.id, updates);
 }

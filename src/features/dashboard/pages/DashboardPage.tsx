@@ -16,7 +16,7 @@ import {
   getDayStart,
 } from '@/shared/hooks/useWeekPlan';
 import { useWorkoutStore } from '@/stores/workoutStore';
-import { formatDuration, formatVolume } from '@/shared/utils/format';
+import { formatVolume } from '@/shared/utils/format';
 import { cn } from '@/shared/utils/cn';
 import type { StagedWorkout } from '@/types';
 
@@ -206,7 +206,7 @@ export function DashboardPage() {
               </div>
             ) : (
               <div className="space-y-2">
-                {selectedDayWorkouts.map((staged, index) => {
+                {selectedDayWorkouts.map((staged) => {
                   const config = TYPE_CONFIG[staged.type];
                   const Icon = config.icon;
                   const isDone = staged.status === 'completed';

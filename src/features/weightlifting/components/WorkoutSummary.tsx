@@ -1,4 +1,4 @@
-import { Trophy, Clock, Dumbbell, TrendingUp, Check } from 'lucide-react';
+import { Trophy, Dumbbell, Check } from 'lucide-react';
 import type { WorkoutLog, Exercise } from '@/types';
 import { StatCard } from '@/shared/components/StatCard';
 import { formatDuration, formatVolume } from '@/shared/utils/format';

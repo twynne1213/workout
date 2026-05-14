@@ -1,5 +1,5 @@
 import { nanoid } from 'nanoid';
-import { getWeekStart, getDayStart } from '@/shared/hooks/useWeekPlan';
+import { getWeekStart } from '@/shared/hooks/useWeekPlan';
 import type { StagedWorkout, StagedWorkoutType } from '@/types';
 
 /**

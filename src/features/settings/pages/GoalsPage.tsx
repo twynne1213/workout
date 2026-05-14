@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { Plus, Target, Trash2, Check, X, ChevronRight } from 'lucide-react';
+import { Plus, Target, Check, X, ChevronRight } from 'lucide-react';
 import { nanoid } from 'nanoid';
 import { db } from '@/data/db';
 import { PageHeader } from '@/shared/components/PageHeader';

@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import {
   Send, BotMessageSquare, Loader2, CalendarCheck,
-  Check, Dumbbell, Activity, StretchHorizontal, ChevronDown,
+  Check, Dumbbell, Activity, StretchHorizontal,
   Wrench,
 } from 'lucide-react';
 import { nanoid } from 'nanoid';

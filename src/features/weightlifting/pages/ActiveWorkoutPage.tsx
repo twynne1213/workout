@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { Plus, X, Trash2 } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 import { db } from '@/data/db';
 import { useWorkoutStore } from '@/stores/workoutStore';
 import { usePreviousSets, usePersonalRecords } from '@/features/weightlifting/hooks/useExerciseHistory';
