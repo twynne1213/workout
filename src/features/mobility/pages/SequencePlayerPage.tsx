@@ -162,16 +162,23 @@ export function SequencePlayerPage() {
           </button>
         </div>
 
-        {allDone && (
-          <div className="p-4">
+        <div className="p-4 space-y-2">
+          {allDone ? (
             <button
               onClick={finishSession}
               className="w-full py-3.5 bg-success text-white rounded-xl font-semibold text-sm"
             >
               <Check size={16} className="inline mr-1" /> Complete Session
             </button>
-          </div>
-        )}
+          ) : (
+            <button
+              onClick={finishSession}
+              className="w-full py-3 text-text-secondary text-sm font-medium"
+            >
+              Finish Early & Log
+            </button>
+          )}
+        </div>
       </div>
     );
   }
@@ -179,20 +186,7 @@ export function SequencePlayerPage() {
   // Edit mode
   return (
     <div>
-      <PageHeader
-        title="Sequence"
-        showBack
-        rightAction={
-          sequence.stretches.length > 0 ? (
-            <button
-              onClick={startPlaying}
-              className="flex items-center gap-1 px-3 py-1.5 bg-warning text-white rounded-lg text-sm font-medium"
-            >
-              <Play size={14} /> Start
-            </button>
-          ) : undefined
-        }
-      />
+      <PageHeader title={sequence.name} showBack />
 
       <div className="px-4 py-4 max-w-lg mx-auto space-y-4">
         {/* Name */}
@@ -257,6 +251,24 @@ export function SequencePlayerPage() {
         >
           <Plus size={16} /> Add Stretch
         </button>
+
+        {/* Action buttons */}
+        <div className="space-y-2 pt-2">
+          {sequence.stretches.length > 0 && (
+            <button
+              onClick={startPlaying}
+              className="w-full py-3.5 bg-warning text-white rounded-xl font-semibold text-sm flex items-center justify-center gap-2"
+            >
+              <Play size={16} /> Start with Timer
+            </button>
+          )}
+          <button
+            onClick={finishSession}
+            className="w-full py-3.5 bg-success text-white rounded-xl font-semibold text-sm flex items-center justify-center gap-2"
+          >
+            <Check size={16} /> Mark Complete
+          </button>
+        </div>
       </div>
 
       {/* Simple stretch picker modal */}
