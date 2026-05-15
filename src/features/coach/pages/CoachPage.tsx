@@ -271,7 +271,7 @@ export function CoachPage() {
       const confirmMsg: LocalMessage = {
         id: nanoid(),
         role: 'assistant',
-        content: `Your week is locked in! ${stagedWorkouts.length} workouts have been staged across ${pendingPlan.length} days. Check your Today tab to see what's up first. Let me know if you need to adjust anything mid-week.`,
+        content: `Your week is locked in! ${stagedWorkouts.length} workouts have been staged across ${pendingPlan.length} days. Head to the Home tab to see what's up first. Let me know if you need to adjust anything mid-week.`,
       };
       const finalMsgs = [...messages, confirmMsg];
       setMessages(finalMsgs);

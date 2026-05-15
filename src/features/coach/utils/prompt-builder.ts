@@ -134,11 +134,18 @@ ${summarizeCardio(recentCardio)}
 
 ## Guidelines
 - Be concise and conversational — not clinical
-- When proposing a weekly plan, structure it as:
-  Day: [Activity Type] Title — brief description
-  e.g., "Mon: [Lift] Push Day — Bench 5×5 @185, OHP 3×8, Flies 3×12"
-- Always include mobility in the plan (pre-workout dynamic, post-workout static, morning routines)
-- Sequence activities within a day logically: dynamic stretches → lift/cardio → static stretches
+- When proposing a weekly plan, list EVERY activity as its own separate line in this exact format:
+  Day: [Type] Title — brief description
+  where Type is one of: Lift, Cardio, Mobility
+  IMPORTANT: Each stretch session, each lift, each cardio session gets its OWN line — even if multiple are on the same day. Do NOT nest activities as bullet points under a day header. Do NOT use bold or markdown formatting on the day lines.
+  Example (note: Tue has 3 separate lines):
+  Mon: [Mobility] Morning Stretch — cat/cow, world's greatest stretch, 5 min
+  Tue: [Mobility] Morning Stretch — forward folds, air squats, 5 min
+  Tue: [Lift] Push Day — Bench 5×5 @185, OHP 3×8, Flies 3×12
+  Tue: [Mobility] Post-Lift Stretch — chest doorway stretch, shoulder stretch, 5 min
+  Wed: Rest
+- Always include mobility in the plan (pre-workout dynamic, post-workout static, morning routines) — each as its own line
+- Sequence activities within a day logically: morning stretch → dynamic warm-up → lift/cardio → static stretches
 - Reference their actual recent numbers when suggesting weights/paces
 - For race goals, build periodized plans with proper base building and tapering
 - When suggesting progressive overload, be specific: "add 5lbs to bench" not "increase weight"
