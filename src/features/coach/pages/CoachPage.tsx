@@ -381,9 +381,13 @@ export function CoachPage() {
             displayContent = msg.content
               .split('\n')
               .filter((line) => {
-                const t = line.trim();
+                const t = line.trim().replace(/^[-*•]\s+/, '');
                 if (!t) return false;
-                return !/^\*{0,2}(Mon|Tue|Wed|Thu|Fri|Sat|Sun)(day)?\b/i.test(t);
+                // Strip day-prefixed lines: "Fri: [Lift] ..."
+                if (/^\*{0,2}(Mon|Tue|Wed|Thu|Fri|Sat|Sun)(day)?\b/i.test(t)) return false;
+                // Strip bracket-tagged lines: "[Lift] ...", "[Mobility] ..."
+                if (/^\[(Lift|Cardio|Mobility|Strength|Weights|Run|Stretch|Yoga)\]/i.test(t)) return false;
+                return true;
               })
               .join('\n')
               .trim();

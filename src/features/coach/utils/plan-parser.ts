@@ -105,29 +105,54 @@ export function parseWeekPlan(text: string): ParsedDay[] {
   const days: Map<number, ParsedDayItem[]> = new Map();
   const lines = text.split('\n');
 
+  // Track the current day context so bullet lines without a day prefix
+  // (e.g. "- [Mobility] Morning Stretch — ...") inherit the last seen day.
+  let currentDow: number | null = null;
+
   for (const line of lines) {
-    const trimmed = line.trim();
+    // Strip leading bullet markers: "- ", "* ", "• "
+    const trimmed = line.trim().replace(/^[-*•]\s+/, '');
     if (!trimmed) continue;
 
-    // Match: "Mon: [Lift] Title — Description" or "Mon: [Lift] Title - Description"
-    // Also handles: "Monday: Title — Description" without brackets
+    // Pattern 1: Line with day prefix — "Fri: [Lift] Leg Day — description"
     const dayMatch = trimmed.match(
       /^(?:\*\*)?(\w+)(?:\*\*)?:\s*(?:\[([^\]]+)\])?\s*(.+)$/i
     );
 
-    if (!dayMatch) continue;
+    let dow: number | null = null;
+    let tag: string | undefined;
+    let rest: string;
 
-    const dayKey = dayMatch[1].toLowerCase();
-    const dow = DAY_MAP[dayKey];
-    if (dow === undefined) continue;
+    if (dayMatch) {
+      const dayKey = dayMatch[1].toLowerCase();
+      const parsedDow = DAY_MAP[dayKey];
+      if (parsedDow !== undefined) {
+        dow = parsedDow;
+        currentDow = parsedDow;
+        tag = dayMatch[2];
+        rest = dayMatch[3].trim();
+      } else {
+        continue; // Not a valid day name
+      }
+    } else {
+      // Pattern 2: Line without day prefix — "[Mobility] Morning Stretch — description"
+      // Inherits the current day context
+      const noDayMatch = trimmed.match(
+        /^\[([^\]]+)\]\s*(.+)$/i
+      );
+      if (!noDayMatch || currentDow === null) continue;
 
-    const tag = dayMatch[2];
-    const rest = dayMatch[3].trim();
+      dow = currentDow;
+      tag = noDayMatch[1];
+      rest = noDayMatch[2].trim();
+    }
+
+    if (dow === null) continue;
 
     // Skip rest days
     if (/^rest\b/i.test(rest)) continue;
 
-    // Split title and description on — or -
+    // Split title and description on — or – or -
     const separatorMatch = rest.match(/^(.+?)\s*(?:—|–|-)\s*(.+)$/);
     let title: string;
     let description: string;
@@ -215,7 +240,14 @@ export function createStagedWorkouts(
  * Heuristic: at least 3 day labels followed by a colon.
  */
 export function looksLikeWeekPlan(text: string): boolean {
-  const dayPattern = /^(?:\*\*)?(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)(?:\*\*)?:/gim;
-  const matches = text.match(dayPattern);
-  return (matches?.length ?? 0) >= 2;
+  // Check for day-prefixed lines: "Fri: [Lift]..." or "**Friday:** ..."
+  const dayPattern = /^(?:[-*•]\s+)?(?:\*\*)?(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)(?:\*\*)?:/gim;
+  const dayMatches = text.match(dayPattern)?.length ?? 0;
+
+  // Also check for bracket-tagged lines: "- [Lift] ...", "[Mobility] ..."
+  const tagPattern = /^(?:[-*•]\s+)?\[(Lift|Cardio|Mobility|Strength|Weights|Run|Stretch|Yoga)\]/gim;
+  const tagMatches = text.match(tagPattern)?.length ?? 0;
+
+  // Either 2+ day-prefixed lines, or 1+ day-prefixed + 2+ tagged lines
+  return dayMatches >= 2 || (dayMatches >= 1 && tagMatches >= 2);
 }
