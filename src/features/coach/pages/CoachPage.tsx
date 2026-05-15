@@ -155,7 +155,7 @@ export function CoachPage() {
     // Auto-detect if the response contains a week plan
     if (looksLikeWeekPlan(fullContent)) {
       const parsed = parseWeekPlan(fullContent);
-      if (parsed.length >= 3) {
+      if (parsed.length >= 2) {
         setPendingPlan(parsed);
       }
     }
