@@ -217,5 +217,5 @@ export function createStagedWorkouts(
 export function looksLikeWeekPlan(text: string): boolean {
   const dayPattern = /^(?:\*\*)?(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)(?:\*\*)?:/gim;
   const matches = text.match(dayPattern);
-  return (matches?.length ?? 0) >= 3;
+  return (matches?.length ?? 0) >= 2;
 }
