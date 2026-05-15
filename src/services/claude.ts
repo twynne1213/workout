@@ -40,7 +40,8 @@ export async function streamChat(
     throw new Error(`Claude API error: ${response.status}`);
   }
 
-  const reader = response.body!.getReader();
+  if (!response.body) { onDone(); return; }
+  const reader = response.body.getReader();
   const decoder = new TextDecoder();
 
   while (true) {

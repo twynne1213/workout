@@ -152,8 +152,8 @@ export function parseWeekPlan(text: string): ParsedDay[] {
     // Skip rest days
     if (/^rest\b/i.test(rest)) continue;
 
-    // Split title and description on — or – or -
-    const separatorMatch = rest.match(/^(.+?)\s*(?:—|–|-)\s*(.+)$/);
+    // Split title and description on — or – (em/en-dash), or space-hyphen-space
+    const separatorMatch = rest.match(/^(.+?)\s*(?:—|–)\s*(.+)$/) ?? rest.match(/^(.+?)\s+-\s+(.+)$/);
     let title: string;
     let description: string;
 

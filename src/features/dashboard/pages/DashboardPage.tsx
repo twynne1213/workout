@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useLiveQuery } from 'dexie-react-hooks';
 import { useNavigate } from 'react-router-dom';
 import {
   Dumbbell, Activity, StretchHorizontal, BotMessageSquare,
@@ -16,8 +15,6 @@ import {
   getDayStart,
 } from '@/shared/hooks/useWeekPlan';
 import { useWorkoutStore } from '@/stores/workoutStore';
-import { formatVolume } from '@/shared/utils/format';
-import { ActivityHeatmap } from '@/shared/components/ActivityHeatmap';
 import { cn } from '@/shared/utils/cn';
 import type { StagedWorkout } from '@/types';
 
@@ -48,52 +45,9 @@ export function DashboardPage() {
   const weekWorkouts = useWeekStagedWorkouts(weekCommit?.id);
   const goals = useActiveGoals();
 
-  // Legacy stats
-  const weekStart = Date.now() - 7 * 24 * 60 * 60 * 1000;
-  const recentLiftLogs = useLiveQuery(
-    () => db.workoutLogs.where('startedAt').above(weekStart).toArray(),
-    [weekStart]
-  );
-  const recentCardioLogs = useLiveQuery(
-    () => db.cardioSessions.where('startedAt').above(weekStart).toArray(),
-    [weekStart]
-  );
-
-  const totalVolume = recentLiftLogs?.reduce((s, w) => s + w.totalVolume, 0) ?? 0;
-  const totalSessions = (recentLiftLogs?.length ?? 0) + (recentCardioLogs?.length ?? 0);
-
-  // Heatmap: query last 13 weeks of completions
-  const heatmapStart = Date.now() - 91 * 24 * 60 * 60 * 1000;
-  const allLiftLogs = useLiveQuery(
-    () => db.workoutLogs.where('startedAt').above(heatmapStart).toArray(),
-    [heatmapStart]
-  );
-  const allCardioLogs = useLiveQuery(
-    () => db.cardioSessions.where('startedAt').above(heatmapStart).toArray(),
-    [heatmapStart]
-  );
-  const allMobilityLogs = useLiveQuery(
-    () => db.mobilityLogs.where('completedAt').above(heatmapStart).toArray(),
-    [heatmapStart]
-  );
-
-  const heatmapData = (() => {
-    const counts = new Map<string, number>();
-    const toDateStr = (epoch: number) => new Date(epoch).toISOString().slice(0, 10);
-    for (const w of allLiftLogs ?? []) {
-      const d = toDateStr(w.startedAt);
-      counts.set(d, (counts.get(d) ?? 0) + 1);
-    }
-    for (const c of allCardioLogs ?? []) {
-      const d = toDateStr(c.startedAt);
-      counts.set(d, (counts.get(d) ?? 0) + 1);
-    }
-    for (const m of allMobilityLogs ?? []) {
-      const d = toDateStr(m.completedAt);
-      counts.set(d, (counts.get(d) ?? 0) + 1);
-    }
-    return Array.from(counts.entries()).map(([date, count]) => ({ date, count }));
-  })();
+  // Week stats derived from the plan
+  const weekCompleted = weekWorkouts?.filter((w) => w.status === 'completed').length ?? 0;
+  const weekTotal = weekWorkouts?.filter((w) => w.status !== 'skipped').length ?? 0;
 
   const hasWeekPlan = weekCommit && weekCommit.status !== 'draft';
   const todayStart = getDayStart();
@@ -440,29 +394,20 @@ export function DashboardPage() {
           </section>
         )}
 
-        {/* ─── Week Stats + Heatmap ─── */}
-        <section>
-          <h2 className="text-sm font-semibold text-text-secondary mb-2">Week Stats</h2>
-          <div className="grid grid-cols-3 gap-2">
-            <StatCard label="Sessions" value={totalSessions.toString()} />
-            <StatCard label="Volume" value={formatVolume(totalVolume)} sublabel="lbs" />
-            <StatCard
-              label="Completion"
-              value={
-                hasWeekPlan && weekWorkouts
-                  ? `${Math.round(
-                      (weekWorkouts.filter((w) => w.status === 'completed').length /
-                        Math.max(weekWorkouts.filter((w) => w.status !== 'skipped').length, 1)) *
-                        100
-                    )}%`
-                  : '—'
-              }
-            />
-          </div>
-          <div className="mt-3">
-            <ActivityHeatmap activityData={heatmapData} />
-          </div>
-        </section>
+        {/* ─── Week Stats ─── */}
+        {hasWeekPlan && (
+          <section>
+            <h2 className="text-sm font-semibold text-text-secondary mb-2">This Week</h2>
+            <div className="grid grid-cols-3 gap-2">
+              <StatCard label="Done" value={weekCompleted.toString()} />
+              <StatCard label="Remaining" value={Math.max(weekTotal - weekCompleted, 0).toString()} />
+              <StatCard
+                label="Completion"
+                value={weekTotal > 0 ? `${Math.round((weekCompleted / weekTotal) * 100)}%` : '—'}
+              />
+            </div>
+          </section>
+        )}
       </div>
     </div>
   );

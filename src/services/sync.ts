@@ -427,7 +427,10 @@ export function startSyncListener(): void {
     });
 
     table.hook('updating', function (mods, _primKey, obj) {
-      // Merge current object with modifications
+      // Skip if only _synced changed (avoids infinite loop)
+      const modKeys = Object.keys(mods as Record<string, unknown>);
+      if (modKeys.length === 1 && modKeys[0] === '_synced') return;
+
       const updated = { ...obj, ...mods };
       setTimeout(() => {
         pushRecord(name, { ...updated, _synced: true }).then(() => {

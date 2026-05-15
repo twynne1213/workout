@@ -109,7 +109,7 @@ export async function buildSequenceFromDescription(
         id: nanoid(),
         name: name.split(' ').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
         category: 'dynamic',
-        targetAreas: ['full_body' as any],
+        targetAreas: ['full_body'],
         defaultDurationSeconds: 30,
         isCustom: true,
         createdAt: now,
