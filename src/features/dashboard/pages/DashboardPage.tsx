@@ -3,7 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { useNavigate } from 'react-router-dom';
 import {
   Dumbbell, Activity, StretchHorizontal, BotMessageSquare,
-  Check, Play, SkipForward, ChevronRight, Flame, Target,
+  Check, Play, SkipForward, ChevronRight, Flame, Target, Undo2,
 } from 'lucide-react';
 import { db } from '@/data/db';
 import { buildSequenceFromDescription } from '@/shared/utils/buildSequenceFromDescription';
@@ -17,6 +17,7 @@ import {
 } from '@/shared/hooks/useWeekPlan';
 import { useWorkoutStore } from '@/stores/workoutStore';
 import { formatVolume } from '@/shared/utils/format';
+import { ActivityHeatmap } from '@/shared/components/ActivityHeatmap';
 import { cn } from '@/shared/utils/cn';
 import type { StagedWorkout } from '@/types';
 
@@ -60,6 +61,39 @@ export function DashboardPage() {
 
   const totalVolume = recentLiftLogs?.reduce((s, w) => s + w.totalVolume, 0) ?? 0;
   const totalSessions = (recentLiftLogs?.length ?? 0) + (recentCardioLogs?.length ?? 0);
+
+  // Heatmap: query last 13 weeks of completions
+  const heatmapStart = Date.now() - 91 * 24 * 60 * 60 * 1000;
+  const allLiftLogs = useLiveQuery(
+    () => db.workoutLogs.where('startedAt').above(heatmapStart).toArray(),
+    [heatmapStart]
+  );
+  const allCardioLogs = useLiveQuery(
+    () => db.cardioSessions.where('startedAt').above(heatmapStart).toArray(),
+    [heatmapStart]
+  );
+  const allMobilityLogs = useLiveQuery(
+    () => db.mobilityLogs.where('completedAt').above(heatmapStart).toArray(),
+    [heatmapStart]
+  );
+
+  const heatmapData = (() => {
+    const counts = new Map<string, number>();
+    const toDateStr = (epoch: number) => new Date(epoch).toISOString().slice(0, 10);
+    for (const w of allLiftLogs ?? []) {
+      const d = toDateStr(w.startedAt);
+      counts.set(d, (counts.get(d) ?? 0) + 1);
+    }
+    for (const c of allCardioLogs ?? []) {
+      const d = toDateStr(c.startedAt);
+      counts.set(d, (counts.get(d) ?? 0) + 1);
+    }
+    for (const m of allMobilityLogs ?? []) {
+      const d = toDateStr(m.completedAt);
+      counts.set(d, (counts.get(d) ?? 0) + 1);
+    }
+    return Array.from(counts.entries()).map(([date, count]) => ({ date, count }));
+  })();
 
   const hasWeekPlan = weekCommit && weekCommit.status !== 'draft';
   const todayStart = getDayStart();
@@ -116,6 +150,10 @@ export function DashboardPage() {
 
   const handleSkipStaged = (staged: StagedWorkout) => {
     db.stagedWorkouts.update(staged.id, { status: 'skipped', updatedAt: Date.now() });
+  };
+
+  const handleUndoSkip = (staged: StagedWorkout) => {
+    db.stagedWorkouts.update(staged.id, { status: 'pending', updatedAt: Date.now() });
   };
 
   // Build week strip data
@@ -282,6 +320,15 @@ export function DashboardPage() {
                           </button>
                         </div>
                       )}
+                      {isSkipped && isViewingToday && (
+                        <button
+                          onClick={() => handleUndoSkip(staged)}
+                          className="flex items-center gap-1 px-2.5 py-1.5 text-text-muted hover:text-primary rounded-lg text-xs font-medium shrink-0 transition-colors"
+                          title="Undo skip"
+                        >
+                          <Undo2 size={12} /> Undo
+                        </button>
+                      )}
                       {isActive && isViewingToday && (
                         <button
                           onClick={() => handleStartStaged(staged)}
@@ -363,6 +410,9 @@ export function DashboardPage() {
             </div>
           </section>
         )}
+
+        {/* ─── Activity Heatmap ─── */}
+        <ActivityHeatmap activityData={heatmapData} />
 
         {/* ─── Goals ─── */}
         {goals && goals.length > 0 && (
