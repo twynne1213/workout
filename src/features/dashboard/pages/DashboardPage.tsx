@@ -156,9 +156,9 @@ export function DashboardPage() {
     db.stagedWorkouts.update(staged.id, { status: 'pending', updatedAt: Date.now() });
   };
 
-  // Build week strip data
+  // Build week strip data (Sun=0 first)
   const weekStripDays = Array.from({ length: 7 }, (_, i) => {
-    const dow = (i + 1) % 7; // Mon=1 → Sun=0
+    const dow = i; // Sun=0, Mon=1, ..., Sat=6
     const dayWorkouts = weekWorkouts?.filter((w) => w.dayOfWeek === dow) ?? [];
     const isToday = dow === todayDow;
     const isPast = (() => {
@@ -411,9 +411,6 @@ export function DashboardPage() {
           </section>
         )}
 
-        {/* ─── Activity Heatmap ─── */}
-        <ActivityHeatmap activityData={heatmapData} />
-
         {/* ─── Goals ─── */}
         {goals && goals.length > 0 && (
           <section>
@@ -443,7 +440,7 @@ export function DashboardPage() {
           </section>
         )}
 
-        {/* ─── Week Stats ─── */}
+        {/* ─── Week Stats + Heatmap ─── */}
         <section>
           <h2 className="text-sm font-semibold text-text-secondary mb-2">Week Stats</h2>
           <div className="grid grid-cols-3 gap-2">
@@ -461,6 +458,9 @@ export function DashboardPage() {
                   : '—'
               }
             />
+          </div>
+          <div className="mt-3">
+            <ActivityHeatmap activityData={heatmapData} />
           </div>
         </section>
       </div>
